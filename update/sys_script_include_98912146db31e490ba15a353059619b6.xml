@@ -16,6 +16,7 @@ Methods:
 * RenderDisclaimer()
 * RenderLicense()
 * RenderRoles()
+* RenderPersonas()
 * RenderProperties()
 * RenderTables()
 * RenderConnectionAndCredentialAliases()
@@ -32,6 +33,7 @@ Methods:
 * RenderRestApis()
 * RenderDependencies()
 * RenderTechnicalDebts()
+* RenderTechnicalDebt()
 * RenderSystemRequirements()
 * RenderInstallationInstructionsImportFromSourceControl()
 * RenderInstallationInstructionsBackgroundScript()
@@ -174,6 +176,40 @@ DocumentationAPI.prototype =
 		return strHtml;			
 	},
 	
+	RenderPersonas: function()
+	{
+		if (this.m_bInit == false)
+		{
+			return this.RenderError();
+		}	
+		var grUR = new GlideRecord('sys_user_role');
+		grUR.addQuery('sys_scope','=',this.m_strAppSysId);
+		grUR.addQuery('suffix','STARTSWITH','persona_');
+		grUR.orderBy('name');
+		grUR.query();
+
+		var strHtml = '';
+		if (grUR.getRowCount() == 0)
+		{
+			strHtml += '<p>No persona roles are defined.</p>';
+		}
+		else
+		{
+			strHtml += '<ul>';
+			while (grUR.next())
+			{
+				var strSuffix = grUR.getValue('suffix');
+				var strPersona = strSuffix.substring(8);
+				strHtml += this.RenderListItem(
+					strPersona,
+					GetInstanceRecordPath('sys_user_role',grUR.sys_id),
+					grUR.getValue('description'))
+			}
+			strHtml += '</ul>';
+		}
+		return strHtml;			
+	},
+
 	RenderProperties: function()
 	{
 		if (this.m_bInit == false)
@@ -747,6 +783,12 @@ DocumentationAPI.prototype =
 
 	RenderTechnicalDebts: function()
 	{
+		// To be deprecated
+		return this.RenderTechnicalDebt();
+	},
+
+	RenderTechnicalDebt: function()
+	{
 		if (this.m_bInit == false)
 		{
 			return this.RenderError();
@@ -845,7 +887,7 @@ DocumentationAPI.prototype =
 		{
 			this.m_bGitHubRepeat = true;
 			strHtml += '<li>Create an account on&#160;<a href="https://github.com/" target="_blank">GitHub</a>&#160;- if not done already.</li>';
-			strHtml += '<li>Create a&#160;<a href="https://github.com/settings/tokens" target="_blank">personal access token</a>&#160;for your GitHub account.</li>';
+			strHtml += '<li>Create a&#160;<a href="https://github.com/settings/tokens/new" target="_blank">personal access token (classic with "repo" scope)</a>&#160;for your GitHub account.</li>';
 			strHtml += '<li>Add&#160;<a href="/discovery_credentials_list.do" target="_blank">credentials</a>&#160;to access GitHub - use "Basic Auth".</li>';
 		}
 		if (bAdditionalSteps == true)
@@ -937,7 +979,7 @@ DocumentationAPI.prototype =
 				strHtml += '<li>Set the&#160;<a href="/nav_to.do?uri=sys_properties.do?sys_id=99ca5ab55b1022001f80efe5f0f91a05" target="_blank">sn_atf.runner.enabled system property</a>&#160;to "true" to activate the ATF test execution - if not set already.</li>';
 			}
 
-			strHtml += '<li>On non-production instances: Run the&#160;<a href="/nav_to.do?uri=sys_atf_test_suite.do?sys_id='+strTestSuiteSysId+'&sysparm_view=devtools&sysparm_view_forced=true" target="_blank">'+grTestSuite.name+'</a> test suite.</li>';
+			strHtml += '<li>On non-production instances: Run the&#160;<a href="/nav_to.do?uri=sys_atf_test_suite.do?sys_id='+strTestSuiteSysId+'&sysparm_view=devtools&sysparm_view_forced=true" target="_blank">'+grTestSuite.name+'</a> Test Suite.</li>';
 		}
 		return strHtml;
 	},
@@ -953,14 +995,15 @@ DocumentationAPI.prototype =
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2021-01-20 15:26:20</sys_created_on>
         <sys_id>98912146db31e490ba15a353059619b6</sys_id>
-        <sys_mod_count>264</sys_mod_count>
+        <sys_mod_count>273</sys_mod_count>
         <sys_name>DocumentationAPI</sys_name>
         <sys_package display_value="DevTools" source="x_snc_devtools">d689f6901bd38450a89720a8ec4bcbfd</sys_package>
         <sys_policy/>
         <sys_scope display_value="DevTools">d689f6901bd38450a89720a8ec4bcbfd</sys_scope>
         <sys_update_name>sys_script_include_98912146db31e490ba15a353059619b6</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-04-29 12:19:53</sys_updated_on>
+        <sys_updated_on>2025-08-04 15:45:07</sys_updated_on>
+        <x_snc_devtools_sys_ui_script/>
     </sys_script_include>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
         <id>98912146db31e490ba15a353059619b6</id>

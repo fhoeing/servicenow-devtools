@@ -21,7 +21,10 @@
 		docapi.RenderDescription();  
 	]</g2:no_escape>	
 
-	<p>Special thanks go to&#160;<a href="mailto:k.janssen@posteo.de">Kevin Janssen</a>&#160;for his contribution to the AzureDevOpsAPI class and &#160;<a href="https://github.com/denysbulakh/transliterate-ukrainian/blob/main/translit.js">Denys Bulakh</a>&#160;who provided the groundwork for the Ukrainian transliteration mechanism in function Transliterate().</p>
+	<p>Special thanks go to&#160;<a href="mailto:k.janssen@posteo.de">Kevin Janssen</a>&#160;for his contribution to the AzureDevOpsAPI class and&#160;<a href="https://github.com/denysbulakh/transliterate-ukrainian/blob/main/translit.js">Denys Bulakh</a>&#160;who provided the groundwork for the Ukrainian transliteration mechanism in function Transliterate().</p>
+
+	<h2>Table of Contents</h2>
+	<g2:no_escape>$[HtmlRenderTableOfContents()]</g2:no_escape>	
 
 	<h2>Disclaimer</h2>
 	<g2:no_escape>$[docapi.RenderDisclaimer()]</g2:no_escape>	
@@ -79,6 +82,48 @@ gs.info('After DeleteAllData(): '+x_snc_devtools.RenderValue(testdata.GetAllData
 	<p>DevTools contains a number of very helpful UI Actions. One of the most powerful features is the "Save" button with active scope switching capabilities. Never ever loose changes because of switching between scopes and browser tabs at the same time.</p>
 	<p>Please refer to the reference section for details.</p>
 	
+	<h3>Building Applications</h3>
+	<p>DevTools provides tools to create boilerplate code and configuration for applications. Follow these steps to get started:</p>
+	<ol>
+		<li>Create a new scoped application.</li>
+		<li>Create a Script Include and call it "AppBuilder".</li>
+		<li>Use the Syntax Editor Macro "AppBuilder" to create boilerplate code in the Script Include.</li>
+		<li>Your Script Include script should look like this:<pre>
+		function AppBuilder()
+{
+	x_snc_devtools.AppBuilder('x_your_scope',
+		'x_parent_app_scope', // Optional: Only if this app "extends" another app's menu
+		'Menu Separator', // Optional: Only if this app should inject a menu separator into another app
+		20000 // Optional: The order of the submenu
+	); 	
+}</pre></li>
+		<li>Replace "x_your_scope" with the scope name of your scoped application.</li>
+		<li>Adjust or remove the other parameters.</li>
+		<li>Run "AppBuilder()" as a background script in the scope of the application.</li>
+		<li>Check out the Application Files that have been created and adjust them as you see fit.</li>
+	</ol>   
+
+	<h3>Building a "Platform" Application</h3>
+	<p>The "Platform" app is special. There should only be one. The "Platform" app represents the instance as a whole and describes dependencies to all other apps that should be deployed on downstream instances. DevTools provides tools to create boilerplate code and configuration for that special "Platform" application. Follow these steps to get started:</p>
+	<ol>
+		<li>Create a new scoped application.</li>
+		<li>The name of the app must include "Platform".</li>
+		<li>Create a Script Include and call it "AppBuilder".</li>
+		<li>Use the Syntax Editor Macro "AppBuilderPlatform" to create boilerplate code in the Script Include.</li>
+		<li>Your Script Include script should look like this:<pre>
+		function AppBuilder()
+{
+	x_snc_devtools.AppBuilderPlatform('x_your_scope'); 	
+}</pre></li>
+		<li>Replace "x_your_scope" with the scope name of your (scoped) "Platform" application.</li>
+		<li>Adjust or remove the other parameters.</li>
+		<li>Run "AppBuilder()" as a background script in the scope of the application.</li>
+		<li>Check out the Application Files that have been created and adjust them as you see fit.</li>
+		<li>Add dependencies to other applications.</li>
+		<li>Adjust the mapping between techncial (subdomain) instance names to pipeline names in DevToolsGetInstancePipelineName().</li> 
+		<li>Manage all instance-specific configuration in AppInstall().</li> 
+	</ol>   
+
 	<h3>Sending a Prompt to a Large Language Model (LLM)</h3>
 
 	<p>The function&#160;<a href="/sys_script_include.do?sys_id=8cece71583e91e5000d5ccc0deaad30e" target="_blank">Prompt()</a>&#160;can be used to send a prompt directly to a large language model, but it requires some setup:</p>
@@ -172,7 +217,7 @@ Set a default config for the generic prompt capability: /nav_to.do?uri=sys_one_e
 	
 	<h3>Technical Debt Management</h3>
 	<p>A Technical Debt is any code or structure that a development team considers as to-be changed at a later point in time because it implies some form of burden to the development and deployment work to be done today.</p>
-	<p>Technical debts need to be managed - and that starts with documenting it. DevTools contains a table to store Technical Debt records which are part of an application and hence are deployed to target-systems. This allows for reporting, work planning and automated documentation.</p>
+	<p>Technical debt needs to be managed - and that starts with documenting it. DevTools contains a table to store Technical Debt records which are part of an application and hence are deployed to target-systems. This allows for reporting, work planning and automated documentation.</p>
 	<p>Unfinished, defective or deprecated features that are part of an application at the time of a version baseline also represent a form of Technical Debt - as all of these require future work. Such features should eventually be hidden from users or prevented to impact the behavior of an application.</p>
 	<p>In cases where the technical debt is associated with a feature that needs to be turned on or off, a technical debt may have an ID and a boolean "switch" that can be used to control logic around these features. Developers can use the following pattern to control how code related to a feature that is currently considered as (or associated with) a Technical Debt should behave:</p>
 	<pre>if (x_snc_devtools.GetTechnicalDebtSwitchState('x_your_scope','id_of_the_technical_debt') == true)
@@ -186,8 +231,8 @@ Set a default config for the generic prompt capability: /nav_to.do?uri=sys_one_e
 	<h3>Evaluator Errors</h3>
 	<p>DevTools helps to surface evaluator errors (which are logged as warnings OOTB). The system property&#160;<a href="/nav_to.do?uri=sys_properties.do?sys_id=439f16571b417510cd6153d16b4bcb80" target="_blank">x_snc_devtools.ui.show_evaluator_errors.minutes</a>&#160;controls whether and for how long evaluator errors should be displayed to admin users.</p>
 	
-	<h3>Force to Record Scope</h3>
-	<p>DevTools enforces to switch to the scope of the current record on a form. This prevents any situation in which a form was loaded in the correct scope, changes are being made, and lost because the user changed the scope in a different tab. The OOTB behavior is downright annoying. DevTools comes to the rescue. The system property&#160;<a href="/nav_to.do?uri=sys_properties.do?sys_id=7b9d7bb2db3e11106a03dad1f3961901" target="_blank">x_snc_devtools.ui.force_scope</a>&#160;controls whether the scope should be changed when loading and saving a form. This may lead to some users being confused by the new (and unexpected) behavior - however, developers quickly become used to it and prefer the behavior over the OOTB behavior.</p>	
+	<h3>Enforce Record Scope</h3>
+	<p>DevTools enforces to switch to the scope of the current record on a form. This prevents any situation in which a form was loaded in the correct scope, changes are being made, and lost because the user changed the scope in a different tab. The OOTB behavior is downright annoying. DevTools comes to the rescue. The system property&#160;<a href="/nav_to.do?uri=sys_properties.do?sys_id=7b9d7bb2db3e11106a03dad1f3961901" target="_blank">x_snc_devtools.ui.force_scope</a>&#160;controls whether the scope should be changed when loading and saving a form. This may lead to some users being confused by the new (and unexpected) behavior - however, developers quickly become used to it and prefer the behavior over the OOTB behavior. Those developers who still do not like the new behavior can deactivate it by using the UI Action "Do NOT enforce record scope" on their User page.</p>	
 	<h3>Instance Pipeline Names</h3>
 	<p>An instance has a technical name (sometimes matching the domain name, but not always). This technical name can be used to define logic that depends on the instance on which code is executed. However, this is not a good practice. In complex environments, where applications may be shared across multiple production instances, any logic that directly depends on a specific instance may cause problems. The DevTools extension point allows to implement the function DevToolsGetInstancePipelineName() which allows to map technical names to so-called pipeline names (e.g., "dev", "test" or "prod"). The function GetInstancePipelineName() can then be used to get the current instance pipeline name to build instance specific logic.</p>	
 	
@@ -253,12 +298,19 @@ function GetEncodedQueryToPreventUselessChecks(rules)
 	<p>Data is managed on each instance and should not be "deployed". Code is part of applications and should be deployed as such.</p>
 	<p>However there are cases where the boundaries are blurry. If data records (i.e. records that are not in a table derived from sys_metadata) must be part of an application the Record Transporter comes to the rescue.</p>
 	<p>The Record Transporter allows to store any record that is not a sys_metadata derivative into a table that is. The table in which these records are stored is x_snc_devtools_transporter_record (which is derived from sys_metadata) and hence its records are captured as part of an application (in source control). Such records are associated to a Record Transporter Package (in table x_snc_devtools_transporter_package).</p>
-	<p>To "pack" records into a Package, create a Package in the GUI - but make sure to select the scope of the application that should contain the package - then use the function RecordTransporterRecordPack() to store individual records into the package.</p>
-	<p>To properly "store" to be deleted records use the function RecordTransporterPackageReset() before adding records to a package. The function will mark all existing records in the package to be deleted on the target instance. Once added again, these records will be stored to the package to be inserted or updated. This allows to keep track on deleted records of earlier versions of the package.</p>
+	<p>To "pack" records into a Package, create a Package in the GUI - but make sure to select the scope of the application that should contain the Package - then use the function RecordTransporterRecordPack() to store individual records into the Package.</p>
+	<p>To properly "store" to be deleted records use the function RecordTransporterPackageReset() before adding records to a Package. The function will mark all existing records in the Package to be deleted on the target instance. Once added again, these records will be stored to the Package to be inserted or updated. This allows to keep track on deleted records of earlier versions of the Package.</p>
 	<p>During installation use the method InstallerAPI::RecordTransporterPackageUnpack() to unpack the contained records on the target instance.</p>
-	<p>Code to store records could look like this:
+	<p>Follow these steps to create a Package, pack records into the Package and unpack the Package:</p>
+	<ol>
+	<li>Navigate to the list of&#160;<a href="/nav_to.do?uri=x_snc_devtools_transporter_package_list.do" target="_blank">Transporter Packages</a>.</li> 
+	<li>Switch the scope to the application that should contain the new Package.</li>
+	<li>Click on "New" to create a new Package.</li>
+	<li>Define a name and the ID Suffix for the Package.</li>
+	<li>Create a Script Include in the application that contains a function that packs the records into the Package.</li>
+	<li>Use the following boilderplate code to pack records. Replace "x_your_scope.demo" with the id as shown in the Package form. 
 		<pre>
-// To set all existing records as to-be-deleted
+// To set all existing records in the Package to-be-deleted
 x_snc_devtools.RecordTransporterPackageReset('x_your_scope.demo');
 			
 // Identify records based on whatever logic
@@ -267,13 +319,13 @@ grRecords.addQuery('name','STARTSWITH','Test ');
 grRecords.query();
 while (grRecords.next())
 {
-	// Pack the identified record into the package
+	// Pack the identified record into the Package
 	x_snc_devtools.RecordTransporterRecordPack('x_your_scope.demo',grRecords);
 }
 		</pre>
-	</p>
-	
-	<p>To unpack records, implement the AppInstall() function in your app like this:
+	</li>
+	<li>Decide on when the records should be (re-)packed into the Package. Whenever a record is changed? When an application is baselined? On-demand only?</li>
+	<li>If it does not exist yet, create the single function Script Include "AppInstall" in the same application. Add or modify the following boilerplate code:
 		<pre>	
 function AppInstall()
 {
@@ -284,7 +336,8 @@ function AppInstall()
 	return installer.Finish();
 }
 		</pre>
-	</p>
+	</li>
+	</ol>
 
 	<h3>CMDB CI Class "ServiceNow App"</h3>
 	<p>DevTools introduces a new CMDB CI class called "ServiceNow App" which represents a ServiceNow app (scoped or global) that is installed on an instance or provided in a Source Control System for installation.</p>
@@ -572,6 +625,8 @@ function YourLengthyProcess(strRecordSysId)
 	</ol>
 	<p>Once all components are in place, the procedure can be tested. Note that if a server-side script that is triggered through a client AJAX request runs into an evaluator error such errors ARE NOT LOGGED. This is annoying and makes debugging more difficult. If your process shows unexpected behavior, use debug logging to narrow down the code that fails.</p> 
 
+	<h2>How to Guides</h2>
+
 	<h3>How to unblock Instance Scan?</h3>
 	<p>On rare occasions an Instance Scan run does not finish properly and remains in an undefined state. This prevents further Instance Scan checks to run. Follow these instructions to unblock Instance Scan and to enable further scan operations:</p>
 	<ol>
@@ -615,14 +670,195 @@ function YourLengthyProcess(strRecordSysId)
 	<h3>Dependencies</h3>
 	<g2:no_escape>$[docapi.RenderDependencies()]</g2:no_escape>		
 
-	<h3>Technical Debts</h3>
-	<g2:no_escape>$[docapi.RenderTechnicalDebts()]</g2:no_escape>			
+	<h3>Technical Debt</h3>
+	<g2:no_escape>$[docapi.RenderTechnicalDebt()]</g2:no_escape>			
 	
 	<h2>License</h2>
 	<g2:no_escape>$[docapi.RenderCopyright(2020,'Sascha Wildgrube')]</g2:no_escape>
 	<g2:no_escape>$[docapi.RenderLicense()]</g2:no_escape>
 	
-	<h2>Release Notes</h2>
+	<h2 toc-ignore-children="true">Release Notes</h2>
+
+	<h3>1.131.0 - 2025-08-07</h3>
+	<ol>
+		<li>Function GetSectionRecord() is deprecated.</li>
+		<li>Added function InstallerAPI::ActivateTest().</li>
+		<li>Added function HtmlRenderTextEmphasized().</li>
+		<li>Added UI Action "Hide message about enforcing scope".</li>
+		<li>Added function AppBuilderPlatform().</li>
+		<li>Added UI page template_manual_platform which serves a s a "Platform" app specific manual boilerplate.</li> 
+		<li>Added function NightlyQA().</li>
+		<li>Added function GetDefaultTechnicalUser().</li>
+		<li>AppBuilder() now creates less extension point implementation functions - as those are typically only implemented in a "Platform" app.</li>
+		<li>Added ATF test for AppBuilder().</li>
+		<li>Added method DocumentationAPI::RenderPersonas().</li>
+		<li>GetTableFromSysId() is no longer searching in cmdb_ire_partial_payloads_index (which may cause false positives).</li>
+		<li>GetTableFromSysId() now also searches kb_knowledge and kb_knowledge_base with priority.</li>
+		<li>HtmlRenderApplications() now shows the number of uncommitted files.</li>
+		<li>HtmlRenderApplications() now renders the number of failed tests highlighted if not zero.</li>
+		<li>GetListRecord() did not works properly if multiple list views are defined for a table (with and without a "parent"). This has been fixed.</li> 
+		<li>ATF Test Step Config "DevTools - Check scoped app sanity" no longer checks role descriptions as this is covered in CodeSanity since version 2.8.0 release on 2023-03-07.</li>
+		<li>ATF Test for RenderValue() no longer uses kb_knowledge records as test data as it may produce false-negatives depending on instance configuration.</li> 
+		<li>Improved output of RenderRecordSummary() when rendering sys_metadata records.</li>
+		<li>Added function GetSysIdAnomalies().</li>
+		<li>Added UI Script function GetSysIdAnomalies().</li>
+		<li>IsValidSysId() now considers additional anomalies: like the sys_ui_form record for change_request in view "Service Operation Workspace" which are all provided by the GetSysIdAnomalies() function.</li> 
+		<li>GetTableFromSysId() incorrectly returned "sys_dictionary" for the Sys ID "global". This has been fixed. It now returns "sys_scope".</li> 
+		<li>Added more patterns to GetEvaluatorErrorExceptionPatterns().</li>
+		<li>Added UI Script MakeTableOfContents().</li>
+		<li>Added table of contents to the manual page.</li>
+		<li>Added new chapter in manual "How to Guides".</li>
+		<li>Added business rule "sys_script_include - sync to ui script" to synchronize a Script Include to a corresponding UI Script as an experimental feature (only available in DevTools for the time being).</li>
+		<li>Added function AppBuilderSyncScriptIncluideToUiScript().</li>
+		<li>Added "DevTools" View and View Rule for Script Include forms.</li>
+		<li>UI Action "Create Macro" is now only available for Script Includes within the DevTools application.</li>
+		<li>Added new chapter "Building Applications" to the manual.</li>
+		<li>Added new chapter "Building a "Platform" Application" to the manual.</li>
+		<li>Added technical debt to consider IsValidFunction() for future deprecation as it is a duplicate of IsFunction().</li> 
+		<li>TestAPI::GetResult() will now report tests as failed if deprecated code was executed during the test. To ignore deprecated code (to test it) use the new function TestAPI::GetResultIgnoreDeprecated().</li>
+		<li>Function Deprecated() now logs all deprecated code in the transaction cache.</li> 
+		<li>Fixed TestAPI::SetContext() and IsTestRunning() as the detection of running tests did not work properly under rare circumstances.</li>
+	</ol>
+
+
+	<h3>1.130.1 - 2025-07-28</h3>
+	<ol>
+		<li>UI Action "Make Code to define this Related List" was missing the required "admin" role.</li>
+	</ol>
+
+
+	<h3>1.130.0 - 2025-07-28</h3>
+	<ol>
+		<li>Added function GetUserPreference().</li>
+		<li>Added function SetUserPreference().</li>
+		<li>Business Rule "sys_metadata - set scope to record scope" now checks if the current user has a preference set to enforce to the record scope or not ("devtools.ui.force_scope").</li>
+		<li>Added UI Actions "Do NOT enforce record scope" and "Enforce record scope" to allow a user to configure whether the record scope should be enforced when loading an Application File record.</li>
+		<li>Added function GetAllTableNames().</li>
+		<li>Added function InstallerAPI::DefineUiPolicyAction().</li>
+		<li>Added function MakeCodeInstallerDefineUiPolicyAction().</li>
+		<li>Added function GenerateCredentialsForUser().</li>
+		<li>Added function GetListRecord().</li>
+		<li>Added function MakeCodeInstallerDefineList().</li>
+		<li>Added function MakeCodeInstallerUnpackPackage().</li>
+		<li>Added UI Action "Generate Credentials" (if smtp is inactive).</li>
+		<li>Added UI Action "Make Code to define this List".</li>
+		<li>Added UI Action "Make Code to unpack this Package".</li>
+		<li>Added system property "x_snc_devtools.ui.generatecredentials_button".</li>
+		<li>Added Business Rule "sys_ui_policy_action - d - sync table" to ensure that the UI Policy Action always inherits the table defined in the UI Policy.</li>		
+		<li>GetParentRecord() and the "Up" button now support ACLs for client callable Script Includes.</li>
+		<li>HtmlRenderPageMakeCode() now also supports MakeCodeInstallerDefineList() and MakeCodeInstallerUnpackPackage().</li>
+		<li>DevToolsClientAPI is now protected by an ACL demanding a logged-in user.</li>
+		<li>Fixed false negative error log message in DevToolsClientAPI::start().</li>
+		<li>Added syntax editor macro for PrepareLogWarning().</li>
+		<li>AppSanity() deleted UI List view definitions for existing Database Views - this has been fixed.</li>
+		<li>AppSanity() no longer deletes sys_wizard_answer records.</li>
+		<li>Improved manual by adding step-by-step instructions on how to set up a Record Transporter Package.</li>
+	</ol>
+
+
+	<h3>1.129.0 - 2025-07-17</h3>
+	<ol>
+		<li>Added function IsOotbRecord().</li>
+		<li>Added function GetAppClaimedOotbRecords().</li>
+		<li>Added function AppUnclaimOotbRecords().</li>
+		<li>Added function InstallerAPI::ActivateFlow().</li>
+		<li>Added function GetSectionRecord().</li>
+		<li>Added function GetFormRecord().</li>
+		<li>Added function InstallerAPI::DefineForm().</li>
+		<li>Added syntax editor macro for MakeCodeInstallerDefineFormSection().</li>
+		<li>Added function MakeCodeInstallerDefineForm().</li>
+		<li>Added UI Action "Make Code to define this Form".</li>
+		<li>HtmlRenderPageMakeCode() now also supports MakeCodeInstallerDefineForm().</li>
+		<li>MakeCodeInstallerDefineFormSection() now also considers existing formatters properly.</li>
+		<li>Added syntax editor macro for the DocumentationAPI class, DatabaseIndexDrop(), GetTableFromSysId(), PrepareLogError() and Deprecated().</li>
+		<li>Removed syntax editor macro for Log().</li>
+	</ol>
+
+
+	<h3>1.128.1 - 2025-07-08</h3>
+	<ol>
+		<li>False negative test result for MakeCodeInstallerDefineRelatedList(). This has been fixed.</li>
+		<li>The Dependency related list did no longer display the dependency application. This has been fixed.</li>
+	</ol>
+
+
+	<h3>1.128.0 - 2025-07-08</h3>
+	<ol>
+		<li>Added function InstallerAPI::AuditQueryRangeACLs().</li>
+		<li>Added function InstallerAPI::DefineRelatedList().</li>
+		<li>Added function InstallerAPI::ChoiceSetDependentValue().</li>
+		<li>Added function MakeCodeInstallerDefineRelatedList().</li>
+		<li>Added function GetFormSectionRecord().</li>
+		<li>Added function GetRelatedListRecord().</li>
+		<li>Improved function MakeCodeInstallerDefineFormSection() to use GetFormSectionRecord().</li>
+		<li>Improved function InstallerAPI::DefineFormSection() to set the annotation type in case of Sys Ids.</li>
+		<li>Added UI Action "Make Code to define this Related Lists".</li>
+		<li>GetParentRecord() and the "Up" button now also support sys_scope_privilege.</li>
+		<li>AppCreate() now sets runtime_access_tracking to "permissive" when creating an app.</li>
+		<li>Function SourceControlCoolDown() is now accessible from all scopes.</li>
+		<li>Added Syntax Editor Macro for UpdateSetDelete() and GetPropertyRecord().</li>
+		<li>Added Technical Debt record for missing Syntax Editor Macros.</li>
+		<li>Added sys_ui_related_list and sys_ui_related_list_entry to GetLinkDirectory().</li>
+		<li>Added related list of "Depending Applications" in the Application form.</li>
+		<li>InstallerAPI::InsertFieldToFormSection() is now deprecated.</li>
+		<li>AppInstall() no longer uses InstallerAPI::InsertFieldToFormSection(). AppInstall() now uses InstallerAPI()::DefineFormSection() instead.</li>
+	</ol>
+
+
+	<h3>1.127.0 - 2025-07-03</h3>
+	<ol>
+		<li>Added function MakeCodeInstallerDefineFormSection().</li>
+		<li>Added function HtmlRenderPageMakeCode().</li>
+		<li>Added UI Action "Make Code to define this Form Section".</li>
+		<li>Added UI Page "Make Code".</li>
+		<li>Added more patterns to GetEvaluatorErrorExceptionPatterns().</li>
+		<li>Renamed "Technical Debts" to "Technical Debt" where applicable.</li>
+		<li>Added function DocumentationAPI::RenderTechnicalDebt() (as a replacement for the to be deprecated function DocumentationAPI::RenderTechnicalDebts()).</li>
+	</ol>
+
+
+	<h3>1.126.0 - 2025-06-24</h3>
+	<ol>
+		<li>Added function TimeAddHours().</li>
+		<li>Updated the syntax editor macro for GetInstanceListUrl().</li>
+		<li>The "Save" button now (really) requires the "public" role instead of "admin" thus making it the de-facto standard way to save a record.</li>
+	</ol>
+
+
+	<h3>1.125.1 - 2025-06-21</h3>
+	<ol>
+		<li>Fixed a regression in Business Rule "DevTools - sys_metadata - Prevent useless checks".</li>
+	</ol>
+
+
+	<h3>1.125.0 - 2025-06-21</h3>
+	<ol>
+		<li>The "Save" button now requires the "public" role instead of "admin" thus making it the de-facto standard way to save a record.</li>
+		<li>Added UI Action "What Runs on Table" to show the What Runs page not for the table of the current record but for the table that is referenced by the current record.</li>
+		<li>WhatRuns now also shows "global" UI Actions.</li>
+		<li>WhatRuns now also shows the action name of UI Actions.</li>
+		<li>WhatRuns now shows what runs during "Delete" more visibly on the right-most column instead under the "Display" section.</li>
+		<li>For each Technical Debt record the url to a related backlog item can now be stored.</li>
+		<li>GetAppUncommittedFiles() now also provides uncommitted deleted Application Files.</li> 
+		<li>GetRecordsFromUpdateXml() now also provides deleted Application Files if the new bIncludeDeleted parameter is set to true.</li>
+		<li>GetTableFromSysId() now also ignores the pa_favorites table.</li>
+		<li>Added function InstallerAPI::ActivateChoice().</li>
+		<li>In InstallerAPI member functions the parameter strTopic has been renamed to strReason to improve clarity.</li>
+		<li>Business rule "sys_metadata - prevent useless checks" now also use IsActive().</li>
+		<li>Added sys_user_group_type to the link directory.</li>
+		<li>Added more patterns to GetEvaluatorErrorExceptionPatterns().</li>
+		<li>DocumentationAPI::RenderInstallationInstructionsImportFromSourceControl() now also mentions the use of a "classic" token with "repo" access.</li> 
+	</ol>
+
+
+	<h3>1.124.0 - 2025-05-21</h3>
+	<ol>
+		<li>ATF Test Step Config "DevTools - Check scoped app sanity" and "DevTools - Check app dependencies" now require the application as a parameter. The reason is that GetStackTrace() does not deliver the correct call stack when invoked within an ATF test step config due to a platform defect.</li>
+		<li>ATF Test Step Config "DevTools - Check scoped app sanity" no longer checks for the copied_from field in ATF tests as it is already covered in AppSanity().</li> 
+		<li>ATF Test Step Config "DevTools - Check scoped app sanity" no longer checks for UI Script descriptions as this is covered by the Instance Scan check "CodeSanity - UI Script description" contained in CodeSanity since version 2.3.0.</li>
+		<li>ATF Test Step Config "DevTools - Check app dependency" is now considered deprecated.</li>
+	</ol>
+
 
 	<h3>1.123.0 - 2025-05-16</h3>
 	<ol>
@@ -2677,14 +2913,14 @@ gs.invalidateCache();
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-02-27 11:17:42</sys_created_on>
         <sys_id>e44fd7541b578450a89720a8ec4bcb8c</sys_id>
-        <sys_mod_count>2060</sys_mod_count>
+        <sys_mod_count>2212</sys_mod_count>
         <sys_name>manual</sys_name>
         <sys_package display_value="DevTools" source="x_snc_devtools">d689f6901bd38450a89720a8ec4bcbfd</sys_package>
         <sys_policy/>
         <sys_scope display_value="DevTools">d689f6901bd38450a89720a8ec4bcbfd</sys_scope>
         <sys_update_name>sys_ui_page_e44fd7541b578450a89720a8ec4bcb8c</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-05-16 10:31:16</sys_updated_on>
+        <sys_updated_on>2025-08-07 06:56:58</sys_updated_on>
     </sys_ui_page>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
         <id>e44fd7541b578450a89720a8ec4bcb8c</id>
